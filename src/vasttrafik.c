@@ -1,9 +1,9 @@
 #include <pebble.h>
 
 Window* window;
-TextLayer *title_layer, *line_layer, *departure_layer, *line_layer_2, *departure_layer_2, *time_layer;
+TextLayer *title_layer, *line_layer, *departure_layer, *line_layer_2, *departure_layer_2;
 
-char line_buffer[64], departure_buffer[32], line_buffer_2[64], departure_buffer_2[32], time_buffer[32];
+char line_buffer[64], departure_buffer[32], line_buffer_2[64], departure_buffer_2[32];
 
 enum
 {
@@ -48,12 +48,6 @@ void process_tuple(Tuple *t)
       text_layer_set_text(departure_layer_2, (char*) &departure_buffer_2);
       break;
   }
-
-  //Set time this update came in
-  time_t temp = time(NULL);
-  struct tm *tm = localtime(&temp);
-  strftime(time_buffer, sizeof("Last updated: XX:XX"), "Last updated: %H:%M", tm);
-  text_layer_set_text(time_layer, (char*) &time_buffer);
 }
 
 void send_int(uint8_t key, uint8_t cmd)
@@ -124,10 +118,6 @@ void window_load(Window *window)
 	departure_layer_2 = init_text_layer(GRect(-5, 50, 144, 30), GColorBlack, GColorClear, "RESOURCE_ID_GOTHIC_18", GTextAlignmentRight);
 	text_layer_set_text(departure_layer_2, "XX min");
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(departure_layer_2));
-
-	time_layer = init_text_layer(GRect(5, 90, 144, 30), GColorBlack, GColorClear, "RESOURCE_ID_GOTHIC_18", GTextAlignmentLeft);
-	text_layer_set_text(time_layer, "Last updated: N/A");
-	layer_add_child(window_get_root_layer(window), text_layer_get_layer(time_layer));
 }
 
 void window_unload(Window *window)
@@ -137,7 +127,6 @@ void window_unload(Window *window)
   text_layer_destroy(departure_layer);
   text_layer_destroy(line_layer_2);
   text_layer_destroy(departure_layer_2);
-  text_layer_destroy(time_layer);
 }
 
 void init()
