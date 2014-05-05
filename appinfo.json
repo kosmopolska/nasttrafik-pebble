@@ -9,10 +9,13 @@
     "watchface": false
   },
   "appKeys": {
-    "KEY_LOCATION": 0,
-    "KEY_TEMPERATURE": 1
+    "KEY_LINE": 0,
+    "KEY_DEPARTURE": 1,
+    "KEY_LINE_2": 2,
+    "KEY_DEPARTURE_2" : 3
   },
   "resources": {
-    "media": []
+    "media": [
+    ]
   }
 }

@@ -1,0 +1,69 @@
+
+function HTTPGET(url) {
+    var req = new XMLHttpRequest();
+    req.open("GET", url, false);
+    req.send(null);
+    return req.responseText;
+}
+
+function parseTime(time) {
+       var c = time.split(':');
+       return parseInt(c[0]) * 60 + parseInt(c[1]);
+}
+
+var getDepartures = function(selector) {
+    //Get weather info
+    var response;
+    if (selector === "a")
+        response = HTTPGET("http://api.vasttrafik.se/bin/rest.exe/v1/departureBoard?authKey=<API-KEY-HERE>&format=json&id=9021014007300000&direction=9021014002025000");
+    else
+        response = HTTPGET("http://api.vasttrafik.se/bin/rest.exe/v1/departureBoard?authKey=<API-KEY-HERE>&format=json&id=9021014007300000&direction=9021014004760000");
+    //Convert to JSON
+    var json = JSON.parse(response);
+
+    //Extract the data
+    var index=-1;
+    var departures = json.DepartureBoard.Departure;
+    for(var i=0;i<departures.length;i++)
+      if(departures[i].sname==="16"){index=i;break;}
+    if (index > -1){
+        var line = departures[index].sname + " " + departures[index].direction;
+
+        var time = parseTime(departures[index].rtTime) - parseTime(json.DepartureBoard.servertime) - 1;
+
+        var departure =  ((time <= 0) ? "nu" : time + " min");
+
+        //Console output to check all is working.
+        console.log(line + " departs in " + departure);
+
+        //Construct a key-value dictionary
+        var dict;
+        if (selector === "a")
+            dict = {"KEY_LINE" : line, "KEY_DEPARTURE": departure};
+        else
+            dict = {"KEY_LINE_2" : line, "KEY_DEPARTURE_2": departure};
+
+        //Send data to watch for display
+        Pebble.sendAppMessage(dict);
+    }
+
+};
+
+
+
+Pebble.addEventListener("ready",
+  function(e) {
+    //App is ready to receive JS messages
+    getDepartures("a");
+    getDepartures("b");
+  }
+);
+
+Pebble.addEventListener("appmessage",
+  function(e) {
+    //Watch wants new data!
+    getDepartures("a");
+    getDepartures("b");
+  }
+);
+
