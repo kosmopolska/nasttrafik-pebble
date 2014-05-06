@@ -4,7 +4,7 @@ vasttrafik-pebble
 Pebble app for Västtrafik
 
 
-![ScreenShot](https://raw.github.com/kosmopolska/vasttrafik-pebble/blob/master/images/screenshot.png)
+![ScreenShot](/images/screenshot.png)
 
 Right now only shows one line in two directions, which is configured in pebble-js-app.js.
 
