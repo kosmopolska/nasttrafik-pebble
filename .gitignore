@@ -6,3 +6,4 @@ build
 # Private files
 *pebble-js-app.js
 notes
+.DS_Store
