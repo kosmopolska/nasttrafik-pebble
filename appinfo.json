@@ -1,7 +1,7 @@
 {
   "uuid": "34cf21f7-77b5-401f-97f2-31b63ef3f09d",
-  "shortName": "V\\u00E4sttrafik",
-  "longName": "V\\u00E4sttrafik",
+  "shortName": "Vasttrafik",
+  "longName": "Vasttrafik",
   "companyName": "Anton Malmquist",
   "versionCode": 1,
   "versionLabel": "1.0.0",
@@ -9,10 +9,11 @@
     "watchface": false
   },
   "appKeys": {
-    "KEY_LINE": 0,
-    "KEY_DEPARTURE": 1,
-    "KEY_LINE_2": 2,
-    "KEY_DEPARTURE_2" : 3
+    "KEY_LINES": 0,
+    "KEY_TIMES": 1,
+    "KEY_STATION_NAME": 2,
+    "KEY_DONE": 3,
+    "KEY_NO_OF_DEPARTURES": 4
   },
   "resources": {
     "media": [

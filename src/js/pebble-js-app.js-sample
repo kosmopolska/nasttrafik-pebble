@@ -11,42 +11,89 @@ function parseTime(time) {
        return parseInt(c[0]) * 60 + parseInt(c[1]);
 }
 
-var getDepartures = function(selector) {
-    //Get weather info
-    var response;
-    if (selector === "a")
-        response = HTTPGET("http://api.vasttrafik.se/bin/rest.exe/v1/departureBoard?authKey=<API-KEY-HERE>&format=json&id=9021014007300000&direction=9021014002025000");
-    else
-        response = HTTPGET("http://api.vasttrafik.se/bin/rest.exe/v1/departureBoard?authKey=<API-KEY-HERE>&format=json&id=9021014007300000&direction=9021014004760000");
+var getDepartures = function() {
+    //Get departure info
+    var response = HTTPGET("http://api.vasttrafik.se/bin/rest.exe/v1/departureBoard?" +
+            "authKey=<API-KEY-HERE>&format=json" +
+            "&id=9021014007300000&timeSpan=60&maxDeparturesPerLine=1");
     //Convert to JSON
     var json = JSON.parse(response);
 
     //Extract the data
-    var index=-1;
     var departures = json.DepartureBoard.Departure;
-    for(var i=0;i<departures.length;i++)
-      if(departures[i].sname==="16"){index=i;break;}
-    if (index > -1){
-        var line = departures[index].sname + " " + departures[index].direction;
 
-        var time = parseTime(departures[index].rtTime) - parseTime(json.DepartureBoard.servertime) - 1;
+    departures.sort(function(a, b) {
+        var x = parseInt(a.sname); var y = parseInt(b.sname);
+        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+    });
 
-        var departure =  ((time <= 0) ? "nu" : time + " min");
+    var time = parseTime(json.DepartureBoard.servertime);
+    console.log("Server time is " + time);
 
-        //Console output to check all is working.
-        console.log(line + " departs in " + departure);
+    var station = departures[0].stop.split(',')[0];
+    appMessageQueue.send({"KEY_STATION_NAME": station});
+    //Send departure pairs.
+    appMessageQueue.send({"KEY_NO_OF_DEPARTURES": departures.length});
+    for(var i=0;i<departures.length;i++) {
+        var departure = departures[i];
+        var lines = departure.sname + " " + departure.direction.split(" via ")[0].replace("gatan", "g.").substring(0,11);
 
-        //Construct a key-value dictionary
-        var dict;
-        if (selector === "a")
-            dict = {"KEY_LINE" : line, "KEY_DEPARTURE": departure};
+        var times = "";
+        if (departure.rtTime)
+            times = String(parseTime(departure.rtTime) - time) + " min";
         else
-            dict = {"KEY_LINE_2" : line, "KEY_DEPARTURE_2": departure};
+            times = "~" + String(parseTime(departure.time) - time) + " min";
 
-        //Send data to watch for display
-        Pebble.sendAppMessage(dict);
+        appMessageQueue.send({"KEY_LINES": lines, "KEY_TIMES": times});
+        console.log(lines);
+        console.log(times);
     }
+    console.log("Done sent");
+    appMessageQueue.send({"KEY_DONE": 1});
 
+};
+
+
+//From https://gist.github.com/Neal/7688920
+var appMessageQueue = {
+    queue: [],
+    numTries: 0,
+    maxTries: 5,
+    working: false,
+    clear: function() {
+        this.queue = [];
+        this.working = false;
+    },
+    isEmpty: function() {
+        return this.queue.length === 0;
+    },
+    nextMessage: function() {
+        return this.isEmpty() ? {} : this.queue[0];
+    },
+    send: function(message) {
+        if (message) this.queue.push(message);
+        if (this.working) return;
+        if (this.queue.length > 0) {
+            this.working = true;
+            var ack = function() {
+                appMessageQueue.numTries = 0;
+                appMessageQueue.queue.shift();
+                appMessageQueue.working = false;
+                appMessageQueue.send();
+            };
+            var nack = function() {
+                appMessageQueue.numTries++;
+                appMessageQueue.working = false;
+                appMessageQueue.send();
+            };
+            if (this.numTries >= this.maxTries) {
+                console.log('Failed sending AppMessage: ' + JSON.stringify(this.nextMessage()));
+                ack();
+            }
+            console.log('Sending AppMessage: ' + JSON.stringify(this.nextMessage()));
+            Pebble.sendAppMessage(this.nextMessage(), ack, nack);
+        }
+    }
 };
 
 
@@ -54,16 +101,14 @@ var getDepartures = function(selector) {
 Pebble.addEventListener("ready",
   function(e) {
     //App is ready to receive JS messages
-    getDepartures("a");
-    getDepartures("b");
+    getDepartures();
   }
 );
 
 Pebble.addEventListener("appmessage",
   function(e) {
     //Watch wants new data!
-    getDepartures("a");
-    getDepartures("b");
+    getDepartures();
   }
 );
 
