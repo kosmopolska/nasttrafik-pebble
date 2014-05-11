@@ -16,7 +16,8 @@ var response = HTTPGET("http://api.vasttrafik.se/bin/rest.exe/v1/departureBoard?
             "authKey=<API-KEY-HERE>&format=json" +
             "&id=9021014007300000&timeSpan=60&maxDeparturesPerLine=1");
 ```
-in src/js/pebble-js-app.jjs-sample
-where id is departure station (here Vasaplatsen).
+in src/js/pebble-js-app.js-sample
+
+The id in the URL is the ID of the wanted station (in the example the id is for Vasaplatsen).
 
 To install, just run pebble build and pebble install.
