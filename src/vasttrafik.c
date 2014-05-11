@@ -57,6 +57,7 @@ void process_tuple(Tuple *t)
     case KEY_NO_OF_DEPARTURES:
       text_layer_set_size(line_layer, GSize(100, value*30));
       text_layer_set_size(times_layer, GSize(140, value*30));
+      //scroll_layer_set_content_size(scroll_layer, GSize(140, value*30));
       break;
   }
 }
@@ -116,23 +117,23 @@ static TextLayer* init_text_layer(GRect location, GColor colour, GColor backgrou
 
 void window_load(Window *window)
 {
-  ScrollLayer *scroll_layer = scroll_layer_create(GRect(0, 0, 144, 168));
-  //layer_add_child(window_get_root_layer(window), scroll_layer_get_layer(scroll_layer));
+  ScrollLayer *scroll_layer = scroll_layer_create(GRect(0, 0, 144, 152));
+  layer_add_child(window_get_root_layer(window), scroll_layer_get_layer(scroll_layer));
   scroll_layer_set_click_config_onto_window(scroll_layer, window);
-  scroll_layer_set_content_size(scroll_layer, GSize(144,168));
+  scroll_layer_set_content_size(scroll_layer, GSize(144,300));
 
 	title_layer = init_text_layer(GRect(0, 0, 144, 30), GColorBlack, GColorClear, "RESOURCE_ID_GOTHIC_18", GTextAlignmentCenter);
   text_layer_set_text(title_layer, "Laddar…");
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(title_layer));
+  scroll_layer_add_child(scroll_layer, text_layer_get_layer(title_layer));
 
   line_layer = init_text_layer(GRect(5, 20, 100, 90), GColorBlack, GColorClear, "RESOURCE_ID_GOTHIC_18", GTextAlignmentLeft);
   text_layer_set_text(line_layer, "");
   //text_layer_set_overflow_mode(line_layer, GTextOverflowModeWordWrap);
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(line_layer));
+  scroll_layer_add_child(scroll_layer, text_layer_get_layer(line_layer));
 
   times_layer = init_text_layer(GRect(0, 20, 140, 90), GColorBlack, GColorClear, "RESOURCE_ID_GOTHIC_18", GTextAlignmentRight);
   text_layer_set_text(times_layer, "");
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(times_layer));
+  scroll_layer_add_child(scroll_layer, text_layer_get_layer(times_layer));
 
 }
 
