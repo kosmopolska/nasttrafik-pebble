@@ -15,7 +15,7 @@ var getDepartures = function() {
     //Get departure info
     var response = HTTPGET("http://api.vasttrafik.se/bin/rest.exe/v1/departureBoard?" +
             "authKey=<API-KEY-HERE>&format=json" +
-            "&id=9021014007300000&timeSpan=60&maxDeparturesPerLine=1");
+            "&id=9021014007300000&timeSpan=30&maxDeparturesPerLine=1");
     //Convert to JSON
     var json = JSON.parse(response);
 
