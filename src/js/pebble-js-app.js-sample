@@ -27,8 +27,8 @@ var getDepartures = function() {
         return ((x < y) ? -1 : ((x > y) ? 1 : 0));
     });
 
-    var time = parseTime(json.DepartureBoard.servertime);
-    console.log("Server time is " + time);
+    var servertime = parseTime(json.DepartureBoard.servertime);
+    console.log("Server time is " + servertime);
 
     var station = departures[0].stop.split(',')[0];
     appMessageQueue.send({"KEY_STATION_NAME": station});
@@ -36,19 +36,19 @@ var getDepartures = function() {
     appMessageQueue.send({"KEY_NO_OF_DEPARTURES": departures.length});
     for(var i=0;i<departures.length;i++) {
         var departure = departures[i];
-        var lines = departure.sname + " " + departure.direction.split(" via ")[0].replace("gatan", "g.").substring(0,11);
+        var line = departure.sname + " " + departure.direction.split(" via ")[0].replace("gatan", "g.").substring(0,11);
 
-        var times = "";
+        var time = "";
         if (departure.rtTime)
-            times = String(parseTime(departure.rtTime) - time - 1) + " min";
+            time = String(parseTime(departure.rtTime) - servertime - 1) + " min";
         else
-            times = "~" + String(parseTime(departure.time) - time - 1) + " min";
-        if (times === "0 min")
-            times = "nu";
+            time = "~" + String(parseTime(departure.time) - servertime - 1) + " min";
+        if (time === "0 min" || time === "-1 min")
+            time = "nu";
 
-        appMessageQueue.send({"KEY_LINES": lines, "KEY_TIMES": times});
-        console.log(lines);
-        console.log(times);
+        appMessageQueue.send({"KEY_LINES": line, "KEY_TIMES": time});
+        console.log(line);
+        console.log(time);
     }
     console.log("Done sent");
     appMessageQueue.send({"KEY_DONE": 1});
